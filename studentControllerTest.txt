@@ -1,0 +1,109 @@
+package com.springbootapp.restfullservices;
+
+import com.springbootapp.restfullservices.Entity.Student;
+import com.springbootapp.restfullservices.Repository.StudentRepository;
+import com.springbootapp.restfullservices.Service.StudentServiceImpl;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.*;
+
+public class StudentServiceTests {
+
+    @InjectMocks
+    StudentServiceImpl studentServiceImpl;
+
+    @Mock
+    StudentRepository studentRepository; //dao
+
+    @Before
+    public void init() {
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void getAllEmployeesTestSuccess() {
+        List<Student> list = new ArrayList<>();
+        Student studentOne = new Student(1L, "Sukanya", "Manoharan", "sukanya@gmail.com", "123suk");
+        Student studentTwo = new Student(2L, "Nirosh", "Manoharan", "mano@yahoo.com", "12345");
+        Student studentThree = new Student(3L, "Rajee", "Manoharan", "nirosh@gmail.com", "1234suk");
+
+        list.add(studentOne);
+        list.add(studentTwo);
+        list.add(studentThree);
+
+        when(studentRepository.findAll()).thenReturn(list);
+
+        //test
+        List<Student> studentList = studentServiceImpl.findAllStudents();
+
+        assertEquals(3, studentList.size());
+        verify(studentRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void getAllEmployeesTestFail() {
+        List<Student> list = new ArrayList<>();
+        Student studentOne = new Student(1L, "Sukanya", "Manoharan", "sukanya@gmail.com", "123suk");
+        Student studentTwo = new Student(2L, "Nirosh", "Manoharan", "mano@yahoo.com", "12345");
+        Student studentThree = new Student(3L, "Rajee", "Manoharan", "nirosh@gmail.com", "1234suk");
+
+        list.add(studentOne);
+        list.add(studentTwo);
+        list.add(studentThree);
+
+        when(studentRepository.findAll()).thenReturn(list);
+
+        //test
+        List<Student> studentList = studentServiceImpl.findAllStudents();
+
+        assertNotEquals(5, studentList.size());
+        verify(studentRepository, times(1)).findAll();
+    }
+
+
+    @Test
+    public void getEmployeeByIdTestSuccess() {
+        when(studentRepository.findById(1L)).thenReturn(java.util.Optional.of(new Student(1L, "Lokesh", "Gupta", "user@email.com", "1233")));
+
+        Student student = studentServiceImpl.findElementById(1L);
+
+        assertEquals("Lokesh", student.getFirstName());
+        assertEquals("Gupta", student.getLastName());
+        assertEquals("user@email.com", student.getEmail());
+        assertEquals("1233", student.getPassword());
+    }
+
+
+    @Test
+    public void getEmployeeByIdTestFail() {
+        when(studentRepository.findById(1L)).thenReturn(java.util.Optional.of(new Student(1L, "Lokesh", "Gupta", "user@email.com", "1233")));
+
+        Student student = studentServiceImpl.findElementById(1L);
+
+        assertNotEquals("Sukku", student.getFirstName());
+        assertNotEquals("Mano", student.getLastName());
+        assertNotEquals("Sukku@email.com", student.getEmail());
+        assertNotEquals("123445", student.getPassword());
+    }
+
+    @Test
+    public void createEmployeeTest() {
+        Student student = new Student(1L, "Lokesh", "Gupta", "user@email.com", "123");
+
+        studentServiceImpl.save(student);
+
+        verify(studentRepository, times(1)).save(student);
+    }
+
+
+}
+
